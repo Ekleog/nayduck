@@ -1,10 +1,12 @@
 Flask-APScheduler
 flask
 google-cloud-storage
+inotify
 prometheus-client
 prometheus-flask-exporter
 psutil
 psycopg2
 requests
 sqlalchemy
+toml
 types-flask
