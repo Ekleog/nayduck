@@ -10,3 +10,4 @@ requests
 sqlalchemy
 toml
 types-flask
+zulip
