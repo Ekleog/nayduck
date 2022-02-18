@@ -13,6 +13,7 @@ import traceback
 import typing
 
 import psutil
+import requests
 
 REPO_URL = 'https://github.com/nearprotocol/nearcore'
 WORKDIR = pathlib.Path('/datadrive')
@@ -319,3 +320,16 @@ def setup_environ() -> None:
     # Apply
     os.environb.clear()
     os.environb.update(env)
+
+FUZZER_CMD_PORT = 7055
+
+class _PausedFuzzers:
+    def __init__(self):
+        requests.get(f'http://127.0.0.1:{FUZZER_CMD_PORT}/pause')
+
+    def __del__(self):
+        requests.get(f'http://127.0.0.1:{FUZZER_CMD_PORT}/resume')
+
+def paused_fuzzers() -> _PausedFuzzers:
+    """Pauses the fuzzers until the end of the scope"""
+    return _PausedFuzzers()
