@@ -149,24 +149,24 @@ def execute_test_command(test: testspec.TestSpec, envb: _EnvB, timeout: int,
     Returns:
         Tests outcome as one of: 'PASSED', 'FAILED', 'IGNORED' or 'TIMEOUT'.
     """
-    with utils.paused_fuzzers():
-        print(f'[RUNNING] {test}', file=sys.stderr)
-        stdout_start = runner.stdout.tell()
-        stderr_start = runner.stderr.tell()
-        envb[b'RUST_BACKTRACE'] = b'1'
-        envb[b'NAYDUCK_TIMEOUT'] = str(timeout).encode('ascii')
-        try:
-            cwd, cmd = get_test_command(test)
+    print(f'[RUNNING] {test}', file=sys.stderr)
+    stdout_start = runner.stdout.tell()
+    stderr_start = runner.stderr.tell()
+    envb[b'RUST_BACKTRACE'] = b'1'
+    envb[b'NAYDUCK_TIMEOUT'] = str(timeout).encode('ascii')
+    try:
+        cwd, cmd = get_test_command(test)
+        with utils.paused_fuzzers():
             ret = runner(cmd, cwd=cwd, timeout=timeout, env=envb)
-        except subprocess.TimeoutExpired:
-            return 'TIMEOUT'
-        try:
-            runner.stdout.seek(stdout_start)
-            runner.stderr.seek(stderr_start)
-            return analyse_test_outcome(test, ret, runner.stdout, runner.stderr)
-        finally:
-            runner.stdout.seek(0, 2)
-            runner.stderr.seek(0, 2)
+    except subprocess.TimeoutExpired:
+        return 'TIMEOUT'
+    try:
+        runner.stdout.seek(stdout_start)
+        runner.stderr.seek(stderr_start)
+        return analyse_test_outcome(test, ret, runner.stdout, runner.stderr)
+    finally:
+        runner.stdout.seek(0, 2)
+        runner.stderr.seek(0, 2)
 
 
 def run_test(outdir: pathlib.Path, test: testspec.TestSpec, envb: _EnvB,

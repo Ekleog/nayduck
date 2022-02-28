@@ -324,11 +324,26 @@ def setup_environ() -> None:
 FUZZER_CMD_PORT = 7055
 
 class _PausedFuzzers:
-    def __init__(self):
-        requests.get(f'http://127.0.0.1:{FUZZER_CMD_PORT}/pause')
+    def _perform_request(self, action):
+        """Perform an action (pause or resume) without risking an exception"""
+        last_exception = None
+        for n in range(3):
+            try:
+                requests.get(f'http://127.0.0.1:{FUZZER_CMD_PORT}/{action}')
+                return
+            except requests.exceptions.RequestException as ex:
+                last_exception = ex
+                time.sleep(1.5 ** n)
+        print(f'Failed to {action} fuzzers: {last_exception}', file=sys.stderr)
 
-    def __del__(self):
-        requests.get(f'http://127.0.0.1:{FUZZER_CMD_PORT}/resume')
+    def __init__(self):
+        self._perform_request('pause')
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, typ, val, traceback):
+        self._perform_request('resume')
 
 def paused_fuzzers() -> _PausedFuzzers:
     """Pauses the fuzzers until the end of the scope"""
