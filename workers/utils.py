@@ -337,10 +337,10 @@ class _PausedFuzzers:
         print(f'Failed to {action} fuzzers: {last_exception}', file=sys.stderr)
 
     def __init__(self):
-        self._perform_request('pause')
+        pass
 
     def __enter__(self):
-        pass
+        self._perform_request('pause')
 
     def __exit__(self, typ, val, traceback):
         self._perform_request('resume')
