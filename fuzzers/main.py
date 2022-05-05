@@ -39,13 +39,13 @@ SYNC_LOG_UPLOAD_INTERVAL = datetime.timedelta(3600)
 
 def connect_to_gcs() -> gcs.Client:
     """Setup the environment to have gsutils work, and return a connection to GCS"""
-    subprocess.run(
-        [
-            'gcloud', 'auth', 'activate-service-account', '--key-file',
-            GCS_CREDENTIALS_FILE
-        ],
-        check=True,
-    )
+    #subprocess.run(
+    #    [
+    #        'gcloud', 'auth', 'activate-service-account', '--key-file',
+    #        GCS_CREDENTIALS_FILE
+    #    ],
+    #    check=True,
+    #)
     return gcs.Client.from_service_account_json(str(GCS_CREDENTIALS_FILE))
     #return gcs.Client(project = 'near-nayduck')
 
